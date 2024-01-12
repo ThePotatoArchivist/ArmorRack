@@ -1,0 +1,45 @@
+{
+	"schemaVersion": 1,
+	"id": "armorrack",
+	"version": "${version}",
+	"name": "ArmorRack",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/armorrack/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"archives.tater.armorrack.ArmorRack"
+		],
+		"client": [
+			"archives.tater.armorrack.ArmorRackClient"
+		],
+		"fabric-datagen": [
+			"archives.tater.armorrack.datagen.ArmorRackDataGenerator"
+		]
+	},
+	"mixins": [
+		"armorrack.mixins.json",
+		{
+			"config": "armorrack.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"accessWidener" : "armorrack.accesswidener",
+	"depends": {
+		"fabricloader": ">=0.15.3",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

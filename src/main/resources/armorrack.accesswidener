@@ -1,0 +1,3 @@
+accessWidener v2 named
+extendable method net/minecraft/entity/decoration/ArmorStandEntity breakAndDropItem (Lnet/minecraft/entity/damage/DamageSource;)V
+extendable method net/minecraft/entity/decoration/ArmorStandEntity spawnBreakParticles ()V
