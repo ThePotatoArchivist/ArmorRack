@@ -25,7 +25,7 @@ public class ArmorRack implements ModInitializer {
 	public static final EntityType<ArmorRackEntity> ARMOR_RACK_ENTITY = Registry.register(
 			Registries.ENTITY_TYPE,
 			new Identifier(MOD_ID, "armor_rack"),
-			FabricEntityTypeBuilder.<ArmorRackEntity>create(SpawnGroup.MISC, ArmorRackEntity::new).dimensions(EntityType.ARMOR_STAND.getDimensions()).build()
+			FabricEntityTypeBuilder.create(SpawnGroup.MISC, ArmorRackEntity::new).dimensions(EntityType.ARMOR_STAND.getDimensions()).build()
 	);
 
 	public static final Item ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, new Identifier(MOD_ID, "armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(16)));

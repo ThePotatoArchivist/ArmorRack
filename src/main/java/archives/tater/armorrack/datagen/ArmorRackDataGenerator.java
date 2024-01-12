@@ -10,5 +10,6 @@ public class ArmorRackDataGenerator implements DataGeneratorEntrypoint {
 
 		pack.addProvider(ModelGenerator::new);
 		pack.addProvider(EnglishLangGenerator::new);
+		pack.addProvider(RecipeGenerator::new);
 	}
 }

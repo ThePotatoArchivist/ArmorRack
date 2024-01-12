@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ingot"
+    },
+    "&": {
+      "item": "minecraft:armor_stand"
+    }
+  },
+  "pattern": [
+    " # ",
+    "#&#",
+    " # "
+  ],
+  "result": {
+    "item": "armorrack:armor_rack"
+  },
+  "show_notification": true
+}
