@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "armorrack:armor_rack"
+        "recipe": "armorrack:empty_armor_rack"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "armorrack:armor_rack"
+      "armorrack:empty_armor_rack"
     ]
   },
   "sends_telemetry_event": false

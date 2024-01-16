@@ -4,9 +4,11 @@ import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.mixin.ArmorStandEntityMixin;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -15,7 +17,7 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.world.World;
 
-import java.util.UUID;
+import java.util.Set;
 
 public class ArmorRackEntity extends ArmorStandEntity {
     public ArmorRackEntity(EntityType<? extends ArmorStandEntity> entityType, World world) {
@@ -31,19 +33,34 @@ public class ArmorRackEntity extends ArmorStandEntity {
 
     @Override
     protected void breakAndDropItem(DamageSource damageSource) {
-        ItemStack itemStack = new ItemStack(ArmorRack.ARMOR_RACK_ITEM);
+        ItemStack itemStack;
+
+        NbtCompound entityTag = new NbtCompound();
+        saveToItemNbt(entityTag);
+
+        final boolean equipped = entityTag.getSize() != 0;
+
+        if (equipped) {
+            itemStack = new ItemStack(ArmorRack.ARMOR_RACK_ITEM);
+            itemStack.setSubNbt("EntityTag", entityTag);
+        } else {
+            itemStack = new ItemStack(ArmorRack.EMPTY_ARMOR_RACK_ITEM);
+        }
+
         if (this.hasCustomName()) {
             itemStack.setCustomName(this.getCustomName());
         }
 
-        NbtCompound entityTag = new NbtCompound();
-        saveToItemNbt(entityTag);
-        if (entityTag.getSize() != 0) {
-            itemStack.getOrCreateNbt().putUuid("nostackUUID",  UUID.randomUUID());
-            itemStack.setSubNbt("EntityTag", entityTag);
+        Entity source = damageSource.getSource();
+        if (source instanceof PlayerEntity player) {
+            if ((equipped || !player.getInventory().containsAny(Set.of(ArmorRack.EMPTY_ARMOR_RACK_ITEM))) && player.getStackInHand(player.getActiveHand()).isEmpty()) {
+                player.setStackInHand(player.getActiveHand(), itemStack);
+            } else {
+                player.giveItemStack(itemStack);
+            }
+        } else {
+            Block.dropStack(this.getWorld(), this.getBlockPos(), itemStack);
         }
-
-        Block.dropStack(this.getWorld(), this.getBlockPos(), itemStack);
         ((ArmorStandEntityMixin) this).invokePlayBreakSound();
         drop(damageSource);
     }

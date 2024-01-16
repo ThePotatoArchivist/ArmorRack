@@ -17,7 +17,7 @@ public class RecipeGenerator extends FabricRecipeProvider {
 
     @Override
     public void generate(Consumer<RecipeJsonProvider> exporter) {
-        ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ArmorRack.ARMOR_RACK_ITEM)
+        ShapedRecipeJsonBuilder.create(RecipeCategory.DECORATIONS, ArmorRack.EMPTY_ARMOR_RACK_ITEM)
                 .pattern(" # ")
                 .pattern("#&#")
                 .pattern(" # ")

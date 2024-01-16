@@ -1,4 +1,5 @@
 {
   "entity.armorrack.armor_rack": "Armor Rack",
-  "item.armorrack.armor_rack": "Armor Rack"
+  "item.armorrack.armor_rack": "Armor Rack",
+  "item.armorrack.empty_armor_rack": "Armor Rack"
 }
