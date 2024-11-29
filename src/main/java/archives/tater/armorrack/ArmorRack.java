@@ -33,6 +33,8 @@ public class ArmorRack implements ModInitializer {
 	public static final Item EMPTY_ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, new Identifier(MOD_ID, "empty_armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(16)));
 	public static final Item ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, new Identifier(MOD_ID, "armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(1)));
 
+	public static final Identifier FALLBACK_MODEL_ID = new Identifier(MOD_ID, "item/armor_rack_fallback");
+
 	@Override
 	public void onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
