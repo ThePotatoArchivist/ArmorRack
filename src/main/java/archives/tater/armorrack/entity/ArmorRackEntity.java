@@ -1,10 +1,9 @@
 package archives.tater.armorrack.entity;
 
 import archives.tater.armorrack.ArmorRack;
-import archives.tater.armorrack.mixin.ArmorStandEntityMixin;
+import archives.tater.armorrack.mixin.ArmorStandEntityInvoker;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
@@ -33,35 +32,20 @@ public class ArmorRackEntity extends ArmorStandEntity {
 
     @Override
     protected void breakAndDropItem(DamageSource damageSource) {
-        ItemStack itemStack;
+        var itemStack = this.toItemStack();
 
-        NbtCompound entityTag = new NbtCompound();
-        saveToItemNbt(entityTag);
+        if (damageSource.isSourceCreativePlayer() && itemStack.getNbt() == null) return;
 
-        final boolean equipped = entityTag.getSize() != 0;
-
-        if (equipped) {
-            itemStack = new ItemStack(ArmorRack.ARMOR_RACK_ITEM);
-            itemStack.setSubNbt("EntityTag", entityTag);
-        } else {
-            itemStack = new ItemStack(ArmorRack.EMPTY_ARMOR_RACK_ITEM);
-        }
-
-        if (this.hasCustomName()) {
-            itemStack.setCustomName(this.getCustomName());
-        }
-
-        Entity source = damageSource.getSource();
-        if (source instanceof PlayerEntity player) {
-            if ((equipped || !player.getInventory().containsAny(Set.of(ArmorRack.EMPTY_ARMOR_RACK_ITEM))) && player.getStackInHand(player.getActiveHand()).isEmpty()) {
+        if (damageSource.getSource() instanceof PlayerEntity player) {
+            if ((!itemStack.isStackable() || !player.getInventory().containsAny(Set.of(itemStack.getItem()))) && player.getStackInHand(player.getActiveHand()).isEmpty()) {
                 player.setStackInHand(player.getActiveHand(), itemStack);
             } else {
-                player.giveItemStack(itemStack);
+                if (!player.giveItemStack(itemStack)) Block.dropStack(getWorld(), getBlockPos(), itemStack);
             }
         } else {
-            Block.dropStack(this.getWorld(), this.getBlockPos(), itemStack);
+            Block.dropStack(getWorld(), getBlockPos(), itemStack);
         }
-        ((ArmorStandEntityMixin) this).invokePlayBreakSound();
+        ((ArmorStandEntityInvoker) this).invokePlayBreakSound();
         drop(damageSource);
     }
 
@@ -81,12 +65,46 @@ public class ArmorRackEntity extends ArmorStandEntity {
         if (this.isInvisible()) nbt.putBoolean("Invisible", true);
         if (this.isSmall()) nbt.putBoolean("Small", true);
         if (this.shouldShowArms()) nbt.putBoolean("ShowArms", true);
-        int disabledSlots = ((ArmorStandEntityMixin) this).getDisabledSlots();
+        int disabledSlots = ((ArmorStandEntityInvoker) this).getDisabledSlots();
         if (disabledSlots != 0) nbt.putInt("DisabledSlots", disabledSlots);
         if (this.shouldHideBasePlate()) nbt.putBoolean("NoBasePlate", true);
         if (this.isMarker()) nbt.putBoolean("Marker", true);
 
-        NbtCompound poseNbt = ((ArmorStandEntityMixin) this).invokePoseToNbt();
+        NbtCompound poseNbt = ((ArmorStandEntityInvoker) this).invokePoseToNbt();
         if (poseNbt.getSize() != 0) nbt.put("Pose", poseNbt);
+    }
+
+    public ItemStack toItemStack() {
+        ItemStack itemStack;
+
+        NbtCompound entityTag = new NbtCompound();
+        saveToItemNbt(entityTag);
+
+        final boolean equipped = entityTag.getSize() != 0;
+
+        if (equipped) {
+            itemStack = new ItemStack(ArmorRack.ARMOR_RACK_ITEM);
+            itemStack.setSubNbt("EntityTag", entityTag);
+        } else {
+            itemStack = new ItemStack(ArmorRack.EMPTY_ARMOR_RACK_ITEM);
+        }
+
+        if (this.hasCustomName()) {
+            itemStack.setCustomName(this.getCustomName());
+        }
+
+        return itemStack;
+    }
+
+    @Override
+    public ItemStack getPickBlockStack() {
+        return ArmorRack.EMPTY_ARMOR_RACK_ITEM.getDefaultStack();
+    }
+
+    public static ArmorRackEntity fromItemStack(World world, ItemStack itemStack) {
+        var entity =  new ArmorRackEntity(ArmorRack.ARMOR_RACK_ENTITY, world);
+        var nbt = itemStack.getSubNbt("EntityTag");
+        if (nbt != null) entity.readNbt(nbt);
+        return entity;
     }
 }

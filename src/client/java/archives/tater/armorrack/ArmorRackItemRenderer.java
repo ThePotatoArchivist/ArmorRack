@@ -15,15 +15,8 @@ public class ArmorRackItemRenderer {
 
     private static final Map<ItemStack, ArmorRackEntity> CACHE = new WeakHashMap<>();
 
-    private static ArmorRackEntity createRack(ItemStack itemStack, World world) {
-        var entity =  new ArmorRackEntity(ArmorRack.ARMOR_RACK_ENTITY, world);
-        var nbt = itemStack.getSubNbt("EntityTag");
-        if (nbt != null) entity.readNbt(nbt);
-        return entity;
-    }
-
     private static ArmorRackEntity getOrCreate(ItemStack itemStack, World world) {
-        return CACHE.computeIfAbsent(itemStack, (_stack) -> createRack(itemStack, world));
+        return CACHE.computeIfAbsent(itemStack, (_stack) -> ArmorRackEntity.fromItemStack(world, itemStack));
     }
 
     public static void renderArmorRack(ItemStack itemStack, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {

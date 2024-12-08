@@ -3,7 +3,9 @@
   "package": "archives.tater.armorrack.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ArmorStandEntityMixin"
+    "ArmorStandEntityInvoker",
+    "ArmorStandEntityMixin",
+    "ArmorStandItemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

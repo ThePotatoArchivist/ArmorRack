@@ -14,6 +14,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
@@ -48,7 +49,7 @@ public class ArmorRack implements ModInitializer {
 		FabricDefaultAttributeRegistry.register(ARMOR_RACK_ENTITY, ArmorRackEntity.createLivingAttributes());
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
-			content.add(EMPTY_ARMOR_RACK_ITEM);
+			content.addAfter(Items.ARMOR_STAND, EMPTY_ARMOR_RACK_ITEM);
 		});
 
         //noinspection OptionalGetWithoutIsPresent

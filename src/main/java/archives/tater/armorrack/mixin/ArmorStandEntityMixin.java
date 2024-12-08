@@ -1,19 +1,19 @@
 package archives.tater.armorrack.mixin;
 
+import archives.tater.armorrack.entity.ArmorRackEntity;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ArmorStandEntity.class)
-public interface ArmorStandEntityMixin {
-    @Invoker("playBreakSound")
-    void invokePlayBreakSound();
-
-    @Accessor
-    int getDisabledSlots();
-
-    @Invoker("poseToNbt")
-    NbtCompound invokePoseToNbt();
+public class ArmorStandEntityMixin {
+    @ModifyExpressionValue(
+            method = "damage",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/damage/DamageSource;isSourceCreativePlayer()Z")
+    )
+    private boolean checkArmorRack(boolean original) {
+        //noinspection ConstantValue
+        return original && !(((Object) this) instanceof ArmorRackEntity);
+    }
 }
