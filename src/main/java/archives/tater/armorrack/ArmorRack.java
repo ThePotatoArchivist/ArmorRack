@@ -7,12 +7,16 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,5 +50,11 @@ public class ArmorRack implements ModInitializer {
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
 			content.add(EMPTY_ARMOR_RACK_ITEM);
 		});
+
+        //noinspection OptionalGetWithoutIsPresent
+        ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(MOD_ID, "flat"),
+				FabricLoader.getInstance().getModContainer(MOD_ID).get(),
+				Text.literal("2D Armor Rack"),
+				ResourcePackActivationType.NORMAL);
 	}
 }
