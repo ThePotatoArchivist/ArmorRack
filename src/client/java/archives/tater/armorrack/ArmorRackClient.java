@@ -12,7 +12,7 @@ import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
 public class ArmorRackClient implements ClientModInitializer {
-	public static final EntityModelLayer MODEL_ARMOR_RACK_LAYER = new EntityModelLayer(new Identifier(ArmorRack.MOD_ID, "armor_rack"), "main");
+	public static final EntityModelLayer MODEL_ARMOR_RACK_LAYER = new EntityModelLayer(ArmorRack.id("armor_rack"), "main");
 
 	@Override
 	public void onInitializeClient() {

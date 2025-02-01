@@ -29,16 +29,20 @@ public class ArmorRack implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+	public static Identifier id(String path) {
+		return Identifier.of(MOD_ID, path);
+	}
+
 	public static final EntityType<ArmorRackEntity> ARMOR_RACK_ENTITY = Registry.register(
 			Registries.ENTITY_TYPE,
-			new Identifier(MOD_ID, "armor_rack"),
+			id("armor_rack"),
 			FabricEntityTypeBuilder.create(SpawnGroup.MISC, ArmorRackEntity::new).dimensions(EntityType.ARMOR_STAND.getDimensions()).build()
 	);
 
-	public static final Item EMPTY_ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, new Identifier(MOD_ID, "empty_armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(16)));
-	public static final Item ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, new Identifier(MOD_ID, "armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(1)));
+	public static final Item EMPTY_ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, id("empty_armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(16)));
+	public static final Item ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, id("armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(1)));
 
-	public static final Identifier FALLBACK_MODEL_ID = new Identifier(MOD_ID, "item/armor_rack_fallback");
+	public static final Identifier FALLBACK_MODEL_ID = id("item/armor_rack_fallback");
 
 	@Override
 	public void onInitialize() {
@@ -53,7 +57,7 @@ public class ArmorRack implements ModInitializer {
 		});
 
         //noinspection OptionalGetWithoutIsPresent
-        ResourceManagerHelper.registerBuiltinResourcePack(new Identifier(MOD_ID, "flat"),
+        ResourceManagerHelper.registerBuiltinResourcePack(id("flat"),
 				FabricLoader.getInstance().getModContainer(MOD_ID).get(),
 				Text.literal("2D Armor Rack"),
 				ResourcePackActivationType.NORMAL);

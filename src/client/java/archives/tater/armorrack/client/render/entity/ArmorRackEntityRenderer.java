@@ -7,7 +7,7 @@ import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.util.Identifier;
 
 public class ArmorRackEntityRenderer extends ArmorStandEntityRenderer {
-    public static final Identifier TEXTURE = new Identifier(ArmorRack.MOD_ID, "textures/entity/armorrack.png");
+    public static final Identifier TEXTURE = ArmorRack.id("textures/entity/armorrack.png");
 
     public ArmorRackEntityRenderer(EntityRendererFactory.Context context) {
         super(context);
