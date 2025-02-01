@@ -9,9 +9,9 @@
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/armor-rack",
-		"sources": "https://github.com/JosiahFu/ArmorRack"
+		"sources": "https://github.com/ThePotatoArchivist/ArmorRack"
 	},
-	"license": "MIT",
+	"license": "LGPL-3.0-or-later",
 	"icon": "assets/armorrack/icon.png",
 	"environment": "*",
 	"entrypoints": {
