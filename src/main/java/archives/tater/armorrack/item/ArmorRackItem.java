@@ -1,6 +1,7 @@
 package archives.tater.armorrack.item;
 
 import archives.tater.armorrack.ArmorRack;
+import archives.tater.armorrack.ArmorRackEntityCache;
 import archives.tater.armorrack.entity.ArmorRackEntity;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -10,9 +11,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorStandItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -24,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -96,25 +95,18 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        NbtCompound entityTag = stack.getSubNbt("EntityTag");
-        if (entityTag == null) return;
+        if (world == null || stack.getNbt() == null || !stack.getNbt().contains("EntityTag")) return;
 
-        NbtList armorItems = entityTag.getList("ArmorItems", NbtElement.COMPOUND_TYPE);
-        if (armorItems != null) {
-            ArrayList<NbtElement> armorList = new ArrayList<>(armorItems);
-            Collections.reverse(armorList);
-            armorList.forEach(armorItem -> {
-                ItemStack armorStack = ItemStack.fromNbt((NbtCompound) armorItem);
-                if (!armorStack.isEmpty()) tooltip.add(armorStack.getName());
-            });
-        }
+        var entity = ArmorRackEntityCache.getOrCreate(stack, world);
 
-        NbtList handItems = entityTag.getList("HandItems", NbtElement.COMPOUND_TYPE);
-        if (handItems != null) {
-            handItems.forEach(handItem -> {
-                ItemStack handStack = ItemStack.fromNbt((NbtCompound) handItem);
-                if (!handStack.isEmpty()) tooltip.add(handStack.getName());
-            });
-        }
+        Consumer<ItemStack> addToTooltip = armorStack -> {
+            if (!armorStack.isEmpty()) tooltip.add(armorStack.getName());
+        };
+
+        var armorItems = new ArrayList<ItemStack>();
+        entity.getArmorItems().forEach(armorItems::add);
+        Collections.reverse(armorItems);
+        armorItems.forEach(addToTooltip);
+        entity.getHandItems().forEach(addToTooltip);
     }
 }

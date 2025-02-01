@@ -22,8 +22,7 @@ public class ArmorStandItemMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;getDimensions()Lnet/minecraft/entity/EntityDimensions;")
     )
     private EntityType<? extends ArmorStandEntity> checkCustom1(EntityType<ArmorStandEntity> original) {
-        if (!(this instanceof ArmorStandProvider provider)) return original;
-        return provider.getSpawnedEntityType();
+        return this instanceof ArmorStandProvider provider ? provider.getSpawnedEntityType() : original;
     }
 
     @ModifyReceiver(
@@ -31,7 +30,6 @@ public class ArmorStandItemMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;create(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/nbt/NbtCompound;Ljava/util/function/Consumer;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;")
     )
     private EntityType<? extends ArmorStandEntity> checkCustom2(EntityType<ArmorStandEntity> instance, ServerWorld world, @Nullable NbtCompound itemNbt, @Nullable Consumer<ArmorStandEntity> afterConsumer, BlockPos pos, SpawnReason reason, boolean alignPosition, boolean invertY) {
-        if (!(this instanceof ArmorStandProvider provider)) return instance;
-        return provider.getSpawnedEntityType();
+        return this instanceof ArmorStandProvider provider ? provider.getSpawnedEntityType() : instance;
     }
 }
