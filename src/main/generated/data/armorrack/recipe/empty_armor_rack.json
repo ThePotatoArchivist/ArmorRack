@@ -15,7 +15,7 @@
     " # "
   ],
   "result": {
-    "item": "armorrack:empty_armor_rack"
-  },
-  "show_notification": true
+    "count": 1,
+    "id": "armorrack:empty_armor_rack"
+  }
 }

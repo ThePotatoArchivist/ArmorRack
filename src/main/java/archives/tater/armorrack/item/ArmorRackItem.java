@@ -1,9 +1,9 @@
 package archives.tater.armorrack.item;
 
 import archives.tater.armorrack.ArmorRack;
-import archives.tater.armorrack.ArmorRackEntityCache;
 import archives.tater.armorrack.entity.ArmorRackEntity;
-import net.minecraft.client.item.TooltipContext;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
@@ -11,6 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorStandItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -19,12 +20,9 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider {
     public ArmorRackItem(Settings settings) {
@@ -50,63 +48,57 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
         return resultStack == null ? super.use(world, user, hand) : TypedActionResult.success(resultStack);
     }
 
-    private static <T> Stream<T> stream(Iterable<T> items) {
-        return StreamSupport.stream(items.spliterator(), false);
-    }
-
     /**
      * null means interaction failed
      */
-    private static @Nullable ItemStack trySwap(PlayerEntity user, ItemStack itemStack) {
-        var entity = ArmorRackEntity.fromItemStack(user.getWorld(), itemStack);
-
-        var itemEmpty = stream(entity.getArmorItems()).allMatch(ItemStack::isEmpty);
-
-        var equippedEmpty = stream(user.getArmorItems()).allMatch(ItemStack::isEmpty);
-
-        if (equippedEmpty && itemEmpty) return null;
+    private static @Nullable ItemStack trySwap(PlayerEntity user, ItemStack stack) {
+        var activeStack = stack.getCount() == 1 ? stack : user.getAbilities().creativeMode ? stack.copyWithCount(1) : stack.split(1);
+        var armorComponent = activeStack.getOrDefault(ArmorRack.ARMOR_STAND_ARMOR, ArmorStandArmorComponent.EMPTY);
+        if (armorComponent.isEmpty() && Arrays.stream(EquipmentSlot.values()).allMatch(slot -> !slot.isArmorSlot() || user.getEquippedStack(slot).isEmpty())) return null;
+        var resultArmor = new HashMap<>(armorComponent.items());
 
         var didEquip = false;
 
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            if (!slot.isArmorSlot()) continue;
+        for (ArmorStandArmorComponent.Slot slot : ArmorStandArmorComponent.Slot.values()) {
+            if (!slot.equipmentSlot.isArmorSlot()) continue;
 
-            ItemStack armorItem = entity.getEquippedStack(slot);
-            ItemStack equippedArmor = user.getEquippedStack(slot);
+            ItemStack armorItem = armorComponent.get(slot);
+            ItemStack equippedArmor = user.getEquippedStack(slot.equipmentSlot);
 
             if (!armorItem.isEmpty()) didEquip = true;
 
-            if (EnchantmentHelper.hasBindingCurse(equippedArmor)) continue;
+            if (EnchantmentHelper.hasAnyEnchantmentsWith(equippedArmor, EnchantmentEffectComponentTypes.PREVENT_ARMOR_CHANGE)) continue;
 
-            user.equipStack(slot, armorItem);
-            entity.equipStack(slot, equippedArmor);
+            user.equipStack(slot.equipmentSlot, armorItem);
+            resultArmor.put(slot, equippedArmor);
         }
 
-        if (!didEquip) user.playSound(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1f, 1f);
+        if (!didEquip) user.playSound(SoundEvents.ITEM_ARMOR_EQUIP_GENERIC.value(), 1f, 1f);
 
-        var resultStack = entity.toItemStack();
+        activeStack.set(ArmorRack.ARMOR_STAND_ARMOR, new ArmorStandArmorComponent(resultArmor));
 
-        if (itemStack.getCount() <= 1) return resultStack;
+        var resultStack = flatten(activeStack);
+
+        if (stack == activeStack) return resultStack;
 
         if (!user.giveItemStack(resultStack)) user.dropStack(resultStack);
-        if (!user.getAbilities().creativeMode) itemStack.decrement(1);
-        return itemStack;
+        return stack;
+    }
+
+    public static ItemStack flatten(ItemStack stack) {
+        @SuppressWarnings("DataFlowIssue") // checked with `contains()`
+        var hasData = stack.contains(DataComponentTypes.ENTITY_DATA) && !stack.get(DataComponentTypes.ENTITY_DATA).isEmpty() || stack.contains(ArmorRack.ARMOR_STAND_ARMOR) && !stack.get(ArmorRack.ARMOR_STAND_ARMOR).isEmpty();
+        var isFullRack = stack.isOf(ArmorRack.ARMOR_RACK_ITEM);
+        if (hasData == isFullRack) return stack;
+        return stack.copyComponentsToNewStack(hasData ? ArmorRack.ARMOR_RACK_ITEM : ArmorRack.EMPTY_ARMOR_RACK_ITEM, stack.getCount());
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (world == null || stack.getNbt() == null || !stack.getNbt().contains("EntityTag")) return;
-
-        var entity = ArmorRackEntityCache.getOrCreate(stack, world);
-
-        Consumer<ItemStack> addToTooltip = armorStack -> {
+    public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
+        var armor = stack.get(ArmorRack.ARMOR_STAND_ARMOR);
+        if (armor == null) return;
+        armor.items().values().forEach(armorStack -> {
             if (!armorStack.isEmpty()) tooltip.add(armorStack.getName());
-        };
-
-        var armorItems = new ArrayList<ItemStack>();
-        entity.getArmorItems().forEach(armorItems::add);
-        Collections.reverse(armorItems);
-        armorItems.forEach(addToTooltip);
-        entity.getHandItems().forEach(addToTooltip);
+        });
     }
 }

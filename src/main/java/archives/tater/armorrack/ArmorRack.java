@@ -2,14 +2,14 @@ package archives.tater.armorrack;
 
 import archives.tater.armorrack.entity.ArmorRackEntity;
 import archives.tater.armorrack.item.ArmorRackItem;
+import archives.tater.armorrack.item.ArmorStandArmorComponent;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.component.ComponentType;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.item.Item;
@@ -19,6 +19,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +37,35 @@ public class ArmorRack implements ModInitializer {
 	public static final EntityType<ArmorRackEntity> ARMOR_RACK_ENTITY = Registry.register(
 			Registries.ENTITY_TYPE,
 			id("armor_rack"),
-			FabricEntityTypeBuilder.create(SpawnGroup.MISC, ArmorRackEntity::new).dimensions(EntityType.ARMOR_STAND.getDimensions()).build()
+			Util.make(() -> {
+				var dimensions = EntityType.ARMOR_STAND.getDimensions();
+				return EntityType.Builder.create(ArmorRackEntity::new, SpawnGroup.MISC)
+						.dimensions(dimensions.width(), dimensions.height());
+			}).build()
 	);
 
-	public static final Item EMPTY_ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, id("empty_armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(16)));
-	public static final Item ARMOR_RACK_ITEM = Registry.register(Registries.ITEM, id("armor_rack"), new ArmorRackItem(new FabricItemSettings().maxCount(1)));
+	public static final ComponentType<ArmorStandArmorComponent> ARMOR_STAND_ARMOR = Registry.register(
+			Registries.DATA_COMPONENT_TYPE,
+			id("armor_stand_armor"),
+			ComponentType.<ArmorStandArmorComponent>builder()
+					.codec(ArmorStandArmorComponent.CODEC)
+					.packetCodec(ArmorStandArmorComponent.PACKET_CODEC)
+					.cache()
+					.build()
+	);
+
+	public static final Item EMPTY_ARMOR_RACK_ITEM = Registry.register(
+			Registries.ITEM,
+			id("empty_armor_rack"),
+			new ArmorRackItem(new Item.Settings()
+					.maxCount(16)
+					.component(ARMOR_STAND_ARMOR, ArmorStandArmorComponent.EMPTY)));
+
+	public static final Item ARMOR_RACK_ITEM = Registry.register(Registries.ITEM,
+			id("armor_rack"),
+			new ArmorRackItem(new Item.Settings()
+					.maxCount(1)
+					.component(ARMOR_STAND_ARMOR, ArmorStandArmorComponent.EMPTY)));
 
 	public static final Identifier FALLBACK_MODEL_ID = id("item/armor_rack_fallback");
 

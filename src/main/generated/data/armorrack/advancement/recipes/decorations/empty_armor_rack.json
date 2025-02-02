@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:armor_stand"
-            ]
+            "items": "minecraft:armor_stand"
           }
         ]
       },
@@ -22,14 +20,13 @@
   },
   "requirements": [
     [
-      "has_armor_stand",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_armor_stand"
     ]
   ],
   "rewards": {
     "recipes": [
       "armorrack:empty_armor_rack"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }
