@@ -36,13 +36,13 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        if (context.getPlayer() != null && context.getPlayer().isSneaking()) return ActionResult.PASS;
+        if (context.getPlayer() != null && context.getPlayer().shouldCancelInteraction()) return ActionResult.PASS;
         return super.useOnBlock(context);
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!user.isSneaking()) return super.use(world, user, hand);
+        if (!user.shouldCancelInteraction()) return super.use(world, user, hand);
         ItemStack itemStack = user.getStackInHand(hand);
         var resultStack = trySwap(user, itemStack);
         return resultStack == null ? super.use(world, user, hand) : TypedActionResult.success(resultStack);
@@ -54,8 +54,10 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
     private static @Nullable ItemStack trySwap(PlayerEntity user, ItemStack stack) {
         var activeStack = stack.getCount() == 1 ? stack : user.getAbilities().creativeMode ? stack.copyWithCount(1) : stack.split(1);
         var armorComponent = activeStack.getOrDefault(ArmorRack.ARMOR_STAND_ARMOR, ArmorStandArmorComponent.EMPTY);
-        if (armorComponent.isEmpty() && Arrays.stream(EquipmentSlot.values()).allMatch(slot -> !slot.isArmorSlot() || user.getEquippedStack(slot).isEmpty())) return null;
+        var empty = armorComponent.isEmpty();
+        if (empty && Arrays.stream(EquipmentSlot.values()).allMatch(slot -> !slot.isArmorSlot() || user.getEquippedStack(slot).isEmpty())) return null;
         var resultArmor = new HashMap<>(armorComponent.items());
+        var fullSwap = empty || armorComponent.items().keySet().stream().anyMatch(slot -> slot.equipmentSlot.isArmorSlot() && user.getEquippedStack(slot.equipmentSlot).isEmpty());
 
         var didEquip = false;
 
@@ -64,6 +66,8 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
 
             ItemStack armorItem = armorComponent.get(slot);
             ItemStack equippedArmor = user.getEquippedStack(slot.equipmentSlot);
+
+            if (!fullSwap && armorItem.isEmpty()) continue;
 
             if (!armorItem.isEmpty()) didEquip = true;
 
