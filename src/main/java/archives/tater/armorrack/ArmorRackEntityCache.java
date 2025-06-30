@@ -1,6 +1,7 @@
 package archives.tater.armorrack;
 
 import archives.tater.armorrack.entity.ArmorRackEntity;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
@@ -11,9 +12,12 @@ public class ArmorRackEntityCache {
     // Static utility class
     private ArmorRackEntityCache() {}
 
-    private static final Map<ItemStack, ArmorRackEntity> CACHE = new WeakHashMap<>();
+    private static final Map<ArmorRackItemData, ArmorRackEntity> CACHE = new WeakHashMap<>();
 
     public static ArmorRackEntity getOrCreate(ItemStack itemStack, World world) {
-        return CACHE.computeIfAbsent(itemStack, (_stack) -> ArmorRackEntity.fromItemStack(world, itemStack));
+        return CACHE.computeIfAbsent(
+                new ArmorRackItemData(itemStack.get(ArmorRack.ARMOR_STAND_ARMOR), itemStack.get(DataComponentTypes.ENTITY_DATA)),
+                (_data) -> ArmorRackEntity.fromItemStack(world, itemStack)
+        );
     }
 }

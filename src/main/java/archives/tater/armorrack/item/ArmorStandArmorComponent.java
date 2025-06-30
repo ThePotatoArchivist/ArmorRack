@@ -11,7 +11,6 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.Nullable;
-import oshi.annotation.concurrent.Immutable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +22,10 @@ import java.util.stream.Collectors;
 import static archives.tater.armorrack.ArmorRackUtil.filterValues;
 
 public class ArmorStandArmorComponent {
-    private final @Immutable HashMap<Slot, ItemStack> items;
+    /**
+     * Should not be mutated
+     */
+    private final HashMap<Slot, ItemStack> items;
 
     public ArmorStandArmorComponent(@Nullable Map<Slot, ItemStack> items) {
         this.items = items == null ? new HashMap<>() : new HashMap<>(filterValues(items, stack -> !stack.isEmpty()));
@@ -45,7 +47,11 @@ public class ArmorStandArmorComponent {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(items);
+        var hashCode = 0;
+        for (var entry : items.entrySet()) {
+            hashCode += entry.getKey().hashCode() ^ ItemStack.hashCode(entry.getValue());
+        }
+        return hashCode;
     }
 
     public void apply(ArmorStandEntity armorStand) {
