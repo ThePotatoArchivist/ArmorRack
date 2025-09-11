@@ -1,7 +1,6 @@
 {
   "pack": {
-    "pack_format": 15,
-    "supported_formats": [15,32],
+    "pack_format": 64,
     "description": "Render armor racks as a 2D sprite"
   }
 }
