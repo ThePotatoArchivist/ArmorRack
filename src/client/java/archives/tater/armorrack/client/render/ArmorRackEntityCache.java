@@ -1,5 +1,6 @@
-package archives.tater.armorrack;
+package archives.tater.armorrack.client.render;
 
+import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.entity.ArmorRackEntity;
 import archives.tater.armorrack.item.ArmorStandArmorComponent;
 import net.minecraft.component.DataComponentTypes;

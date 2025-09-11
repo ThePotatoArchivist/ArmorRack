@@ -1,5 +1,7 @@
-package archives.tater.armorrack;
+package archives.tater.armorrack.client.render.item;
 
+import archives.tater.armorrack.ArmorRack;
+import archives.tater.armorrack.client.render.ArmorRackEntityCache;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.model.json.ModelTransformationMode;

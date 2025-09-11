@@ -1,6 +1,7 @@
 package archives.tater.armorrack;
 
 import archives.tater.armorrack.client.render.entity.ArmorRackEntityRenderer;
+import archives.tater.armorrack.client.render.item.ArmorRackItemRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -9,7 +10,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.render.entity.model.ArmorStandEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.util.Identifier;
 
 public class ArmorRackClient implements ClientModInitializer {
 	public static final EntityModelLayer MODEL_ARMOR_RACK_LAYER = new EntityModelLayer(ArmorRack.id("armor_rack"), "main");
