@@ -2,6 +2,7 @@ package archives.tater.armorrack.item;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.item.ItemStack;
@@ -10,48 +11,42 @@ import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
-import static archives.tater.armorrack.ArmorRackUtil.filterValues;
+import static archives.tater.armorrack.ArmorRackUtil.*;
 
-public class ArmorStandArmorComponent {
-    /**
-     * Should not be mutated
-     */
-    private final HashMap<Slot, ItemStack> items;
-
-    public ArmorStandArmorComponent(@Nullable Map<Slot, ItemStack> items) {
-        this.items = items == null ? new HashMap<>() : new HashMap<>(filterValues(items, stack -> !stack.isEmpty()));
+public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) {
+    public ArmorStandArmorComponent {
+        items = filterValues(items, stack -> !stack.isEmpty());
     }
 
-    public Map<Slot, ItemStack> items() { return items; }
+    public ItemStack get(Slot slot) {
+        return items.getOrDefault(slot, ItemStack.EMPTY);
+    }
 
-    public ItemStack get(Slot slot) { return items.getOrDefault(slot, ItemStack.EMPTY); }
-    public ItemStack get(EquipmentSlot slot) { return get(Slot.REVERSE.get(slot)); }
+    public ItemStack get(EquipmentSlot slot) {
+        return get(Slot.REVERSE.get(slot));
+    }
 
-    public boolean isEmpty() { return items.isEmpty(); }
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
 
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ArmorStandArmorComponent that = (ArmorStandArmorComponent) o;
-        return Objects.equals(items, that.items);
+        return stackMapsEqual(this.items, that.items);
     }
 
     @Override
     public int hashCode() {
-        var hashCode = 0;
-        for (var entry : items.entrySet()) {
-            hashCode += entry.getKey().hashCode() ^ ItemStack.hashCode(entry.getValue());
-        }
-        return hashCode;
+        return stackMapHash(items);
     }
 
     public void apply(ArmorStandEntity armorStand) {
@@ -84,7 +79,9 @@ public class ArmorStandArmorComponent {
             this.equipmentSlot = equipmentSlot;
         }
 
-        public int id() { return id; }
+        public int id() {
+            return id;
+        }
 
         @Override
         public String asString() {
@@ -104,6 +101,8 @@ public class ArmorStandArmorComponent {
             Codec.unboundedMap(StringIdentifiable.createCodec(Slot::values), ItemStack.CODEC)
                     .xmap(ArmorStandArmorComponent::new, component -> component.items);
 
+    private static final PacketCodec<RegistryByteBuf, Map<Slot, ItemStack>> SLOTS_PACKET_CODEC = PacketCodecs.map(Object2ObjectOpenHashMap::new, Slot.PACKET_CODEC, ItemStack.PACKET_CODEC);
+
     public static final PacketCodec<RegistryByteBuf, ArmorStandArmorComponent> PACKET_CODEC =
-            PacketCodecs.map(HashMap::new, Slot.PACKET_CODEC, ItemStack.PACKET_CODEC).xmap(ArmorStandArmorComponent::new, component -> component.items);
+            SLOTS_PACKET_CODEC.xmap(ArmorStandArmorComponent::new, component -> component.items);
 }
