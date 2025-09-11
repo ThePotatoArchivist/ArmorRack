@@ -22,7 +22,7 @@
 			"archives.tater.armorrack.ArmorRackClient"
 		],
 		"fabric-datagen": [
-			"archives.tater.armorrack.datagen.ArmorRackDataGenerator"
+          "archives.tater.armorrack.ArmorRackDataGenerator"
 		]
 	},
 	"mixins": [

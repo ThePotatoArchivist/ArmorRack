@@ -1,5 +1,8 @@
-package archives.tater.armorrack.datagen;
+package archives.tater.armorrack;
 
+import archives.tater.armorrack.datagen.EnglishLangGenerator;
+import archives.tater.armorrack.datagen.ModelGenerator;
+import archives.tater.armorrack.datagen.RecipeGenerator;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 

@@ -8,7 +8,7 @@ import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import java.util.concurrent.CompletableFuture;
 
 public class EnglishLangGenerator extends FabricLanguageProvider {
-    protected EnglishLangGenerator(FabricDataOutput dataOutput, CompletableFuture<WrapperLookup> registriesFuture) {
+    public EnglishLangGenerator(FabricDataOutput dataOutput, CompletableFuture<WrapperLookup> registriesFuture) {
         super(dataOutput, registriesFuture);
     }
 
