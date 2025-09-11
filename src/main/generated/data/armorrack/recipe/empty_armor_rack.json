@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "#": {
-      "item": "minecraft:iron_ingot"
-    },
-    "&": {
-      "item": "minecraft:armor_stand"
-    }
+    "#": "minecraft:iron_ingot",
+    "&": "minecraft:armor_stand"
   },
   "pattern": [
     " # ",

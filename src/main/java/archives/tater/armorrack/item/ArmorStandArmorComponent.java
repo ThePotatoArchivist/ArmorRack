@@ -3,24 +3,30 @@ package archives.tater.armorrack.item;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.component.ComponentsAccess;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.tooltip.TooltipAppender;
+import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
+import net.minecraft.text.Text;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 import static archives.tater.armorrack.ArmorRackUtil.*;
 
-public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) {
+public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) implements TooltipAppender {
     public ArmorStandArmorComponent {
         items = filterValues(items, stack -> !stack.isEmpty());
     }
@@ -35,6 +41,13 @@ public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) {
 
     public boolean isEmpty() {
         return items.isEmpty();
+    }
+
+    @Override
+    public void appendTooltip(Item.TooltipContext context, Consumer<Text> textConsumer, TooltipType type, ComponentsAccess components) {
+        items().values().forEach(armorStack -> {
+            if (!armorStack.isEmpty()) textConsumer.accept(armorStack.getName());
+        });
     }
 
     @Override
@@ -90,7 +103,7 @@ public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) {
 
         public static final Map<EquipmentSlot, Slot> REVERSE = Arrays.stream(Slot.values()).collect(Collectors.toUnmodifiableMap(slot -> slot.equipmentSlot, slot -> slot));
 
-        public static final IntFunction<Slot> ID_TO_VALUE = ValueLists.createIdToValueFunction(
+        public static final IntFunction<Slot> ID_TO_VALUE = ValueLists.createIndexToValueFunction(
                 Slot::id, Slot.values(), ValueLists.OutOfBoundsHandling.ZERO
         );
 

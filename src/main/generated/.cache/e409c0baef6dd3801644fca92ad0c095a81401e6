@@ -1,3 +1,4 @@
-// 1.21.1	2025-02-01T04:09:29.826254473	ArmorRack/Model Definitions
-95343605355fad6be261853ac3a04ad89cb83305 assets/armorrack/models/item/armor_rack_fallback.json
-1bdbe98420b29ea7fc5ac0e7031a91dc72d52b22 assets/armorrack/models/item/empty_armor_rack.json
+// 1.21.8	-999999999-01-01T00:00:00	ArmorRack/Model Definitions
+00b18ad7f0f152caf9f4ca290de89e71514467a3 assets/armorrack/items/armor_rack.json
+00b18ad7f0f152caf9f4ca290de89e71514467a3 assets/armorrack/items/empty_armor_rack.json
+95343605355fad6be261853ac3a04ad89cb83305 assets/armorrack/models/item/armor_rack.json

@@ -61,11 +61,11 @@ public class ArmorRackEntity extends ArmorStandEntity {
         if (this.shouldShowArms()) nbt.putBoolean("ShowArms", true);
         int disabledSlots = ((ArmorStandEntityInvoker) this).getDisabledSlots();
         if (disabledSlots != 0) nbt.putInt("DisabledSlots", disabledSlots);
-        if (this.shouldHideBasePlate()) nbt.putBoolean("NoBasePlate", true);
+        if (!this.shouldShowBasePlate()) nbt.putBoolean("NoBasePlate", true);
         if (this.isMarker()) nbt.putBoolean("Marker", true);
 
-        NbtCompound poseNbt = ((ArmorStandEntityInvoker) this).invokePoseToNbt();
-        if (poseNbt.getSize() != 0) nbt.put("Pose", poseNbt);
+        var rotation = packRotation();
+        if (!rotation.equals(PackedRotation.DEFAULT)) nbt.put("Pose", PackedRotation.CODEC, rotation);
 
         return nbt;
     }

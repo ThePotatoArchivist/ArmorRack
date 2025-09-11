@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "armorrack:item/armor_rack_entity",
+    "model": {
+      "type": "armorrack:armor_rack"
+    }
+  }
+}

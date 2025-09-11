@@ -3,7 +3,7 @@ package archives.tater.armorrack.client.render.entity;
 import archives.tater.armorrack.ArmorRack;
 import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.client.render.entity.state.ArmorStandEntityRenderState;
 import net.minecraft.util.Identifier;
 
 public class ArmorRackEntityRenderer extends ArmorStandEntityRenderer {
@@ -14,7 +14,7 @@ public class ArmorRackEntityRenderer extends ArmorStandEntityRenderer {
     }
 
     @Override
-    public Identifier getTexture(ArmorStandEntity armorStandEntity) {
+    public Identifier getTexture(ArmorStandEntityRenderState armorStandEntityRenderState) {
         return TEXTURE;
     }
 }

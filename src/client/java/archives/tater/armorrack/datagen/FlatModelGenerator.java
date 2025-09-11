@@ -1,14 +1,15 @@
 package archives.tater.armorrack.datagen;
 
 import archives.tater.armorrack.ArmorRack;
-import archives.tater.armorrack.client.render.item.ArmorRackModelRenderer;
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.minecraft.client.data.*;
+import net.minecraft.client.data.BlockStateModelGenerator;
+import net.minecraft.client.data.ItemModelGenerator;
+import net.minecraft.client.data.ItemModels;
 
-public class ModelGenerator extends FabricModelProvider {
+public class FlatModelGenerator extends FabricModelProvider {
 
-	public ModelGenerator(FabricDataOutput output) {
+	public FlatModelGenerator(FabricDataOutput output) {
 		super(output);
 	}
 
@@ -19,9 +20,8 @@ public class ModelGenerator extends FabricModelProvider {
 
 	@Override
 	public void generateItemModels(ItemModelGenerator itemModelGenerator) {
-        var model = ItemModels.special(ArmorRack.id("item/armor_rack_entity"), new ArmorRackModelRenderer.Unbaked());
+        var model = ItemModels.basic(ArmorRack.FLAT_MODEL_ID);
 		itemModelGenerator.output.accept(ArmorRack.EMPTY_ARMOR_RACK_ITEM, model);
         itemModelGenerator.output.accept(ArmorRack.ARMOR_RACK_ITEM, model);
-		Models.GENERATED.upload(ArmorRack.FLAT_MODEL_ID, TextureMap.layer0(ArmorRack.ARMOR_RACK_ITEM), itemModelGenerator.modelCollector);
 	}
 }
