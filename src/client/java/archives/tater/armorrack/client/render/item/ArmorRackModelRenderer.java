@@ -45,7 +45,11 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandEn
     @Override
     public @Nullable ArmorStandEntityRenderState getData(ItemStack stack) {
         var world = MinecraftClient.getInstance().world;
-        return world == null ? null : getRenderer().getAndUpdateRenderState(ArmorRackEntityCache.getOrCreate(stack, world), 1f);
+        if (world == null) return null;
+        var renderer = getRenderer();
+        var state = renderer.createRenderState();
+        renderer.updateRenderState(ArmorRackEntityCache.getOrCreate(stack, world), state, 1f);
+        return state;
     }
 
     public record Unbaked() implements SpecialModelRenderer.Unbaked {
