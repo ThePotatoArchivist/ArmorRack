@@ -7,8 +7,8 @@ import archives.tater.armorrack.mixin.ArmorStandEntityInvoker;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.TypedEntityData;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,8 +29,8 @@ public class ArmorRackEntity extends ArmorStandEntity {
 
     @Override
     protected void spawnBreakParticles() {
-        if (this.getWorld() instanceof ServerWorld) {
-            ((ServerWorld)this.getWorld()).spawnParticles(new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.ANVIL.getDefaultState()), this.getX(), this.getBodyY(0.6666666666666666), this.getZ(), 10, this.getWidth() / 4.0F, this.getHeight() / 4.0F, this.getWidth() / 4.0F, 0.05);
+        if (this.getEntityWorld() instanceof ServerWorld serverWorld) {
+            serverWorld.spawnParticles(new BlockStateParticleEffect(ParticleTypes.BLOCK, Blocks.ANVIL.getDefaultState()), this.getX(), this.getBodyY(0.6666666666666666), this.getZ(), 10, this.getWidth() / 4.0F, this.getHeight() / 4.0F, this.getWidth() / 4.0F, 0.05);
         }
     }
 
@@ -44,10 +44,10 @@ public class ArmorRackEntity extends ArmorStandEntity {
             if ((!itemStack.isStackable() || !player.getInventory().containsAny(Set.of(itemStack.getItem()))) && player.getStackInHand(player.getActiveHand()).isEmpty()) {
                 player.setStackInHand(player.getActiveHand(), itemStack);
             } else {
-                if (!player.giveItemStack(itemStack)) Block.dropStack(getWorld(), getBlockPos(), itemStack);
+                if (!player.giveItemStack(itemStack)) Block.dropStack(getEntityWorld(), getBlockPos(), itemStack);
             }
         } else {
-            Block.dropStack(getWorld(), getBlockPos(), itemStack);
+            Block.dropStack(getEntityWorld(), getBlockPos(), itemStack);
         }
         ((ArmorStandEntityInvoker) this).invokePlayBreakSound();
         drop(serverWorld, damageSource);
@@ -74,7 +74,7 @@ public class ArmorRackEntity extends ArmorStandEntity {
         var entityTag = saveToItemNbt();
 
         var itemStack = new ItemStack(ArmorRack.ARMOR_RACK_ITEM);
-        if (entityTag.getSize() > 1) itemStack.set(DataComponentTypes.ENTITY_DATA, NbtComponent.of(entityTag));
+        if (entityTag.getSize() > 1) itemStack.set(DataComponentTypes.ENTITY_DATA, TypedEntityData.create(getType(), entityTag));
         itemStack.set(ArmorRack.ARMOR_STAND_ARMOR, ArmorStandArmorComponent.from(this));
 
         var resultStack = ArmorRackItem.flatten(itemStack);

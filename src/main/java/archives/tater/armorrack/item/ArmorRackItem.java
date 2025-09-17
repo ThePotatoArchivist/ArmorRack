@@ -92,9 +92,10 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
         return stack;
     }
 
+    @SuppressWarnings("deprecation")
     public static ItemStack flatten(ItemStack stack) {
         @SuppressWarnings("DataFlowIssue") // checked with `contains()`
-        var hasData = stack.contains(DataComponentTypes.ENTITY_DATA) && !stack.get(DataComponentTypes.ENTITY_DATA).isEmpty() || stack.contains(ArmorRack.ARMOR_STAND_ARMOR) && !stack.get(ArmorRack.ARMOR_STAND_ARMOR).isEmpty();
+        var hasData = stack.contains(DataComponentTypes.ENTITY_DATA) && !stack.get(DataComponentTypes.ENTITY_DATA).getNbtWithoutId().isEmpty() || stack.contains(ArmorRack.ARMOR_STAND_ARMOR) && !stack.get(ArmorRack.ARMOR_STAND_ARMOR).isEmpty();
         var isFullRack = stack.isOf(ArmorRack.ARMOR_RACK_ITEM);
         if (hasData == isFullRack) return stack;
         return stack.copyComponentsToNewStack(hasData ? ArmorRack.ARMOR_RACK_ITEM : ArmorRack.EMPTY_ARMOR_RACK_ITEM, stack.getCount());

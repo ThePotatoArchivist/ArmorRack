@@ -2,12 +2,11 @@ package archives.tater.armorrack.client.render.item;
 
 import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.client.render.ArmorRackEntityCache;
-import archives.tater.armorrack.mixin.client.EntityRenderDispatcherAccessor;
+import archives.tater.armorrack.client.render.entity.ArmorRackEntityRenderer;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.class_12075;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.ArmorStandEntityRenderer;
-import net.minecraft.client.render.entity.model.LoadedEntityModels;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.state.ArmorStandEntityRenderState;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -22,34 +21,30 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandEn
 
     public ArmorRackModelRenderer() {}
 
+    private static final class_12075 UNKNOWN_OBJECT = new class_12075();
+
     @Override
-    public void render(@Nullable ArmorStandEntityRenderState data, ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, boolean glint) {
+    public void render(@Nullable ArmorStandEntityRenderState data, ItemDisplayContext displayContext, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, boolean glint) {
         matrices.push();
         matrices.translate(0.5f, 0f, 0.5f);
         matrices.scale(-1, 1, -1);
-        getRenderer().render(data, matrices, vertexConsumers, light);
+        MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(data).render(data, matrices, queue, UNKNOWN_OBJECT);
         matrices.pop();
     }
 
     @Override
     public void collectVertices(Set<Vector3f> vertices) {
         MatrixStack matrixStack = new MatrixStack();
-        getRenderer().getModel().getRootPart().collectVertices(matrixStack, vertices);
-    }
-
-
-    private static ArmorStandEntityRenderer getRenderer() {
-        return (ArmorStandEntityRenderer) ((EntityRenderDispatcherAccessor) MinecraftClient.getInstance().getEntityRenderDispatcher()).getRenderers().get(ArmorRack.ARMOR_RACK_ENTITY);
+        var state = new ArmorStandEntityRenderState();
+        state.entityType = ArmorRack.ARMOR_RACK_ENTITY;
+        ((ArmorRackEntityRenderer) MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(state)).getModel().getRootPart().collectVertices(matrixStack, vertices);
     }
 
     @Override
     public @Nullable ArmorStandEntityRenderState getData(ItemStack stack) {
         var world = MinecraftClient.getInstance().world;
         if (world == null) return null;
-        var renderer = getRenderer();
-        var state = renderer.createRenderState();
-        renderer.updateRenderState(ArmorRackEntityCache.getOrCreate(stack, world), state, 1f);
-        return state;
+        return ArmorRackEntityCache.getOrCreate(stack, world);
     }
 
     public record Unbaked() implements SpecialModelRenderer.Unbaked {
@@ -57,7 +52,7 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandEn
         public static final MapCodec<Unbaked> CODEC = MapCodec.unit(new Unbaked());
 
         @Override
-        public SpecialModelRenderer<?> bake(LoadedEntityModels entityModels) {
+        public SpecialModelRenderer<?> bake(BakeContext context) {
             return new ArmorRackModelRenderer();
         }
 
