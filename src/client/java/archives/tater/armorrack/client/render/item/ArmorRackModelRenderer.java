@@ -4,11 +4,11 @@ import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.client.render.ArmorRackEntityCache;
 import archives.tater.armorrack.client.render.entity.ArmorRackEntityRenderer;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.class_12075;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.state.ArmorStandEntityRenderState;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
+import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
@@ -21,14 +21,16 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandEn
 
     public ArmorRackModelRenderer() {}
 
-    private static final class_12075 UNKNOWN_OBJECT = new class_12075();
+    private static final CameraRenderState CAMERA_STATE = new CameraRenderState();
 
     @Override
-    public void render(@Nullable ArmorStandEntityRenderState data, ItemDisplayContext displayContext, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, boolean glint) {
+    public void render(@Nullable ArmorStandEntityRenderState data, ItemDisplayContext displayContext, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, boolean glint, int i) {
+        if (data != null)
+            data.light = light;
         matrices.push();
         matrices.translate(0.5f, 0f, 0.5f);
         matrices.scale(-1, 1, -1);
-        MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(data).render(data, matrices, queue, UNKNOWN_OBJECT);
+        MinecraftClient.getInstance().getEntityRenderDispatcher().getRenderer(data).render(data, matrices, queue, CAMERA_STATE);
         matrices.pop();
     }
 
