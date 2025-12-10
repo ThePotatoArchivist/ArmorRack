@@ -3,12 +3,14 @@ package archives.tater.armorrack;
 import archives.tater.armorrack.entity.ArmorRackEntity;
 import archives.tater.armorrack.item.ArmorRackItem;
 import archives.tater.armorrack.item.ArmorStandArmorComponent;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
+
 import net.minecraft.component.ComponentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -22,6 +24,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,16 +90,16 @@ public class ArmorRack implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		FabricDefaultAttributeRegistry.register(ARMOR_RACK_ENTITY, ArmorRackEntity.createLivingAttributes());
+        //noinspection DataFlowIssue
+        FabricDefaultAttributeRegistry.register(ARMOR_RACK_ENTITY, ArmorRackEntity.createLivingAttributes());
 
 		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
 			content.addAfter(Items.ARMOR_STAND, EMPTY_ARMOR_RACK_ITEM);
 		});
 
-        //noinspection OptionalGetWithoutIsPresent
-        ResourceManagerHelper.registerBuiltinResourcePack(FLAT_RESOURCE_PACK_ID,
-				FabricLoader.getInstance().getModContainer(MOD_ID).get(),
+        ResourceLoader.registerBuiltinPack(FLAT_RESOURCE_PACK_ID,
+				FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow(),
 				Text.literal("2D Armor Rack"),
-				ResourcePackActivationType.NORMAL);
+				PackActivationType.NORMAL);
 	}
 }

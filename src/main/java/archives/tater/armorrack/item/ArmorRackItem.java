@@ -2,6 +2,7 @@ package archives.tater.armorrack.item;
 
 import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.entity.ArmorRackEntity;
+
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.EnchantmentEffectComponentTypes;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -9,19 +10,21 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ArmorStandItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
 public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider {
-    public ArmorRackItem(Settings settings) {
+    public ArmorRackItem(Item.Settings settings) {
         super(settings);
     }
 

@@ -3,6 +3,7 @@ package archives.tater.armorrack.client.render.item;
 import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.client.render.ArmorRackEntityCache;
 import archives.tater.armorrack.client.render.entity.ArmorRackEntityRenderer;
+
 import com.mojang.serialization.MapCodec;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
@@ -12,10 +13,11 @@ import net.minecraft.client.render.state.CameraRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 
-import java.util.Set;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3fc;
+
+import java.util.function.Consumer;
 
 public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandEntityRenderState> {
 
@@ -35,7 +37,7 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandEn
     }
 
     @Override
-    public void collectVertices(Set<Vector3f> vertices) {
+    public void collectVertices(Consumer<Vector3fc> vertices) {
         MatrixStack matrixStack = new MatrixStack();
         var state = new ArmorStandEntityRenderState();
         state.entityType = ArmorRack.ARMOR_RACK_ENTITY;
@@ -51,7 +53,7 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandEn
 
     public record Unbaked() implements SpecialModelRenderer.Unbaked {
 
-        public static final MapCodec<Unbaked> CODEC = MapCodec.unit(new Unbaked());
+        public static final MapCodec<ArmorRackModelRenderer.Unbaked> CODEC = MapCodec.unit(new ArmorRackModelRenderer.Unbaked());
 
         @Override
         public SpecialModelRenderer<?> bake(BakeContext context) {
