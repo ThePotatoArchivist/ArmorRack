@@ -1,12 +1,11 @@
 package archives.tater.armorrack;
 
-import net.minecraft.item.ItemStack;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import net.minecraft.world.item.ItemStack;
 
 public class ArmorRackUtil {
     public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> entriesToMap() {
@@ -22,7 +21,7 @@ public class ArmorRackUtil {
         if (!keys.equals(second.keySet()))
             return false;
         for (var key : keys) {
-            if (!ItemStack.areItemsAndComponentsEqual(first.get(key), second.get(key)))
+            if (!ItemStack.isSameItemSameComponents(first.get(key), second.get(key)))
                 return false;
         }
         return true;

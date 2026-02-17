@@ -3,21 +3,19 @@ package archives.tater.armorrack.client.render;
 import archives.tater.armorrack.ItemStackWrapper;
 import archives.tater.armorrack.client.render.entity.ArmorRackEntityRenderer;
 import archives.tater.armorrack.entity.ArmorRackEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.state.ArmorStandEntityRenderState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-
 import java.util.Map;
 import java.util.WeakHashMap;
+import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ArmorRackEntityCache {
     // Static utility class
     private ArmorRackEntityCache() {}
 
-    private static final Map<World, Map<ItemStackWrapper, ArmorStandEntityRenderState>> CACHE = new WeakHashMap<>();
+    private static final Map<Level, Map<ItemStackWrapper, ArmorStandRenderState>> CACHE = new WeakHashMap<>();
 
-    public static ArmorStandEntityRenderState getOrCreate(ItemStack itemStack, World world) {
+    public static ArmorStandRenderState getOrCreate(ItemStack itemStack, Level world) {
         return CACHE.computeIfAbsent(
                 world,
                 _world -> new WeakHashMap<>()

@@ -3,40 +3,38 @@ package archives.tater.armorrack.datagen;
 import archives.tater.armorrack.ArmorRack;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.data.recipe.RecipeExporter;
-import net.minecraft.data.recipe.RecipeGenerator;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
-
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.world.item.Items;
 import java.util.concurrent.CompletableFuture;
 
-public class ARRecipeGenerator extends RecipeGenerator {
+public class ARRecipeGenerator extends RecipeProvider {
 
-    protected ARRecipeGenerator(WrapperLookup registries, RecipeExporter exporter) {
+    protected ARRecipeGenerator(net.minecraft.core.HolderLookup.Provider registries, RecipeOutput exporter) {
         super(registries, exporter);
     }
 
     @Override
-    public void generate() {
-        createShaped(RecipeCategory.DECORATIONS, ArmorRack.EMPTY_ARMOR_RACK_ITEM)
+    public void buildRecipes() {
+        shaped(RecipeCategory.DECORATIONS, ArmorRack.EMPTY_ARMOR_RACK_ITEM)
                 .pattern(" # ")
                 .pattern("#&#")
                 .pattern(" # ")
                 .input('#', Items.IRON_INGOT)
                 .input('&', Items.ARMOR_STAND)
-                .criterion(hasItem(Items.ARMOR_STAND), conditionsFromItem(Items.ARMOR_STAND))
-                .offerTo(exporter);
+                .criterion(getHasName(Items.ARMOR_STAND), has(Items.ARMOR_STAND))
+                .offerTo(output);
     }
 
     public static class Provider extends FabricRecipeProvider {
 
-        public Provider(FabricDataOutput output, CompletableFuture<WrapperLookup> registriesFuture) {
+        public Provider(FabricDataOutput output, CompletableFuture<net.minecraft.core.HolderLookup.Provider> registriesFuture) {
             super(output, registriesFuture);
         }
 
         @Override
-        protected RecipeGenerator getRecipeGenerator(WrapperLookup wrapperLookup, RecipeExporter recipeExporter) {
+        protected RecipeProvider createRecipeProvider(net.minecraft.core.HolderLookup.Provider wrapperLookup, RecipeOutput recipeExporter) {
             return new ARRecipeGenerator(wrapperLookup, recipeExporter);
         }
 

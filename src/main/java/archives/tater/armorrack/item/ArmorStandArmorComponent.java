@@ -3,19 +3,6 @@ package archives.tater.armorrack.item;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipAppender;
-import net.minecraft.item.tooltip.TooltipType;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.text.Text;
-import net.minecraft.util.StringIdentifiable;
-import net.minecraft.util.function.ValueLists;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -23,10 +10,23 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.stream.Collectors;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ByIdMap;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 
 import static archives.tater.armorrack.ArmorRackUtil.*;
 
-public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) implements TooltipAppender {
+public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) implements TooltipProvider {
     public ArmorStandArmorComponent {
         items = filterValues(items, stack -> !stack.isEmpty());
     }
@@ -44,9 +44,9 @@ public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) impl
     }
 
     @Override
-    public void appendTooltip(Item.TooltipContext context, Consumer<Text> textConsumer, TooltipType type, ComponentsAccess components) {
+    public void addToTooltip(Item.TooltipContext context, Consumer<Component> textConsumer, TooltipFlag type, DataComponentGetter components) {
         items().values().forEach(armorStack -> {
-            if (!armorStack.isEmpty()) textConsumer.accept(armorStack.getName());
+            if (!armorStack.isEmpty()) textConsumer.accept(armorStack.getHoverName());
         });
     }
 
@@ -62,21 +62,21 @@ public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) impl
         return stackMapHash(items);
     }
 
-    public void apply(ArmorStandEntity armorStand) {
+    public void apply(ArmorStand armorStand) {
         for (var slot : Slot.values()) {
-            armorStand.equipStack(slot.equipmentSlot, get(slot));
+            armorStand.setItemSlot(slot.equipmentSlot, get(slot));
         }
     }
 
-    public static ArmorStandArmorComponent from(ArmorStandEntity armorStand) {
+    public static ArmorStandArmorComponent from(ArmorStand armorStand) {
         return new ArmorStandArmorComponent(Arrays.stream(Slot.values())
-                .collect(Collectors.toMap(slot -> slot, slot -> armorStand.getEquippedStack(slot.equipmentSlot)))
+                .collect(Collectors.toMap(slot -> slot, slot -> armorStand.getItemBySlot(slot.equipmentSlot)))
         );
     }
 
     public static final ArmorStandArmorComponent EMPTY = new ArmorStandArmorComponent(Map.of());
 
-    public enum Slot implements StringIdentifiable {
+    public enum Slot implements StringRepresentable {
         HEAD(0, EquipmentSlot.HEAD),
         CHEST(1, EquipmentSlot.CHEST),
         LEGS(2, EquipmentSlot.LEGS),
@@ -97,25 +97,25 @@ public record ArmorStandArmorComponent(@NotNull Map<Slot, ItemStack> items) impl
         }
 
         @Override
-        public String asString() {
-            return equipmentSlot.asString();
+        public String getSerializedName() {
+            return equipmentSlot.getSerializedName();
         }
 
         public static final Map<EquipmentSlot, Slot> REVERSE = Arrays.stream(Slot.values()).collect(Collectors.toUnmodifiableMap(slot -> slot.equipmentSlot, slot -> slot));
 
-        public static final IntFunction<Slot> ID_TO_VALUE = ValueLists.createIndexToValueFunction(
-                Slot::id, Slot.values(), ValueLists.OutOfBoundsHandling.ZERO
+        public static final IntFunction<Slot> ID_TO_VALUE = ByIdMap.continuous(
+                Slot::id, Slot.values(), ByIdMap.OutOfBoundsStrategy.ZERO
         );
 
-        public static final PacketCodec<ByteBuf, Slot> PACKET_CODEC = PacketCodecs.indexed(ID_TO_VALUE, Slot::id);
+        public static final StreamCodec<ByteBuf, Slot> PACKET_CODEC = ByteBufCodecs.idMapper(ID_TO_VALUE, Slot::id);
     }
 
     public static final Codec<ArmorStandArmorComponent> CODEC =
-            Codec.unboundedMap(StringIdentifiable.createCodec(Slot::values), ItemStack.CODEC)
+            Codec.unboundedMap(StringRepresentable.fromEnum(Slot::values), ItemStack.CODEC)
                     .xmap(ArmorStandArmorComponent::new, component -> component.items);
 
-    private static final PacketCodec<RegistryByteBuf, Map<Slot, ItemStack>> SLOTS_PACKET_CODEC = PacketCodecs.map(Object2ObjectOpenHashMap::new, Slot.PACKET_CODEC, ItemStack.PACKET_CODEC);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Map<Slot, ItemStack>> SLOTS_PACKET_CODEC = ByteBufCodecs.map(Object2ObjectOpenHashMap::new, Slot.PACKET_CODEC, ItemStack.STREAM_CODEC);
 
-    public static final PacketCodec<RegistryByteBuf, ArmorStandArmorComponent> PACKET_CODEC =
-            SLOTS_PACKET_CODEC.xmap(ArmorStandArmorComponent::new, component -> component.items);
+    public static final StreamCodec<RegistryFriendlyByteBuf, ArmorStandArmorComponent> PACKET_CODEC =
+            SLOTS_PACKET_CODEC.map(ArmorStandArmorComponent::new, component -> component.items);
 }

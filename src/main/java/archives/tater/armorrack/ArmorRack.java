@@ -10,21 +10,19 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
-
-import net.minecraft.component.ComponentType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.Items;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,47 +36,47 @@ public class ArmorRack implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
 	public static Identifier id(String path) {
-		return Identifier.of(MOD_ID, path);
+		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
 
     private static <T extends Entity> EntityType<T> register(Identifier id, EntityType.Builder<T> type) {
-        var key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id);
-        return Registry.register(Registries.ENTITY_TYPE, key, type.build(key));
+        var key = ResourceKey.create(Registries.ENTITY_TYPE, id);
+        return Registry.register(BuiltInRegistries.ENTITY_TYPE, key, type.build(key));
     }
 
-    private static Item register(Identifier id, Function<Item.Settings, Item> factory, Item.Settings settings) {
-        var key = RegistryKey.of(RegistryKeys.ITEM, id);
-        return Registry.register(Registries.ITEM, key, factory.apply(settings.registryKey(key)));
+    private static Item register(Identifier id, Function<Item.Properties, Item> factory, Item.Properties settings) {
+        var key = ResourceKey.create(Registries.ITEM, id);
+        return Registry.register(BuiltInRegistries.ITEM, key, factory.apply(settings.setId(key)));
     }
 
 	public static final EntityType<ArmorRackEntity> ARMOR_RACK_ENTITY = register(
 			id("armor_rack"),
-			EntityType.Builder.create(ArmorRackEntity::new, SpawnGroup.MISC)
-                    .dimensions(EntityType.ARMOR_STAND.getDimensions().width(), EntityType.ARMOR_STAND.getDimensions().height())
+			EntityType.Builder.of(ArmorRackEntity::new, MobCategory.MISC)
+                    .sized(EntityType.ARMOR_STAND.getDimensions().width(), EntityType.ARMOR_STAND.getDimensions().height())
 	);
 
-	public static final ComponentType<ArmorStandArmorComponent> ARMOR_STAND_ARMOR = Registry.register(
-			Registries.DATA_COMPONENT_TYPE,
+	public static final DataComponentType<ArmorStandArmorComponent> ARMOR_STAND_ARMOR = Registry.register(
+			BuiltInRegistries.DATA_COMPONENT_TYPE,
 			id("armor_stand_armor"),
-			ComponentType.<ArmorStandArmorComponent>builder()
-					.codec(ArmorStandArmorComponent.CODEC)
-					.packetCodec(ArmorStandArmorComponent.PACKET_CODEC)
-					.cache()
+			DataComponentType.<ArmorStandArmorComponent>builder()
+					.persistent(ArmorStandArmorComponent.CODEC)
+					.networkSynchronized(ArmorStandArmorComponent.PACKET_CODEC)
+					.cacheEncoding()
 					.build()
 	);
 
 	public static final Item EMPTY_ARMOR_RACK_ITEM = register(
 			id("empty_armor_rack"),
             ArmorRackItem::new,
-			new Item.Settings()
-					.maxCount(16)
+			new Item.Properties()
+					.stacksTo(16)
 					.component(ARMOR_STAND_ARMOR, ArmorStandArmorComponent.EMPTY));
 
 	public static final Item ARMOR_RACK_ITEM = register(
 			id("armor_rack"),
 			ArmorRackItem::new,
-            new Item.Settings()
-					.maxCount(1)
+            new Item.Properties()
+					.stacksTo(1)
 					.component(ARMOR_STAND_ARMOR, ArmorStandArmorComponent.EMPTY));
 
 	public static final Identifier FLAT_MODEL_ID = id("item/armor_rack");
@@ -93,13 +91,13 @@ public class ArmorRack implements ModInitializer {
         //noinspection DataFlowIssue
         FabricDefaultAttributeRegistry.register(ARMOR_RACK_ENTITY, ArmorRackEntity.createLivingAttributes());
 
-		ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
+		ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
 			content.addAfter(Items.ARMOR_STAND, EMPTY_ARMOR_RACK_ITEM);
 		});
 
         ResourceLoader.registerBuiltinPack(FLAT_RESOURCE_PACK_ID,
 				FabricLoader.getInstance().getModContainer(MOD_ID).orElseThrow(),
-				Text.literal("2D Armor Rack"),
+				Component.literal("2D Armor Rack"),
 				PackActivationType.NORMAL);
 	}
 }

@@ -1,8 +1,8 @@
 package archives.tater.armorrack.item;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.ArmorStand;
 
 public interface ArmorStandProvider {
-    EntityType<? extends ArmorStandEntity> getSpawnedEntityType();
+    EntityType<? extends ArmorStand> getSpawnedEntityType();
 }

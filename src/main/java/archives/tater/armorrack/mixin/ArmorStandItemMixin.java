@@ -5,45 +5,45 @@ import archives.tater.armorrack.item.ArmorStandProvider;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReceiver;
 import com.llamalad7.mixinextras.sugar.Local;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.ArmorStandItem;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import java.util.function.Consumer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.ArmorStand;
+import net.minecraft.world.item.ArmorStandItem;
+import net.minecraft.world.item.context.UseOnContext;
 
 @Mixin(ArmorStandItem.class)
 public class ArmorStandItemMixin {
     @ModifyReceiver(
-            method = "useOnBlock",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;getDimensions()Lnet/minecraft/entity/EntityDimensions;")
+            method = "useOn",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;getDimensions()Lnet/minecraft/world/entity/EntityDimensions;")
     )
-    private EntityType<? extends ArmorStandEntity> checkCustom1(EntityType<ArmorStandEntity> original) {
+    private EntityType<? extends ArmorStand> checkCustom1(EntityType<ArmorStand> original) {
         return this instanceof ArmorStandProvider provider ? provider.getSpawnedEntityType() : original;
     }
 
     @ModifyReceiver(
-            method = "useOnBlock",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;create(Lnet/minecraft/server/world/ServerWorld;Ljava/util/function/Consumer;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;")
+            method = "useOn",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/server/level/ServerLevel;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;ZZ)Lnet/minecraft/world/entity/Entity;")
     )
-    private EntityType<? extends ArmorStandEntity> checkCustom2(EntityType<ArmorStandEntity> instance, ServerWorld world, @Nullable Consumer<ArmorStandEntity> afterConsumer, BlockPos pos, SpawnReason reason, boolean alignPosition, boolean invertY) {
+    private EntityType<? extends ArmorStand> checkCustom2(EntityType<ArmorStand> instance, ServerLevel world, @Nullable Consumer<ArmorStand> afterConsumer, BlockPos pos, EntitySpawnReason reason, boolean alignPosition, boolean invertY) {
         return this instanceof ArmorStandProvider provider ? provider.getSpawnedEntityType() : instance;
     }
 
     @ModifyExpressionValue(
-            method = "useOnBlock",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityType;create(Lnet/minecraft/server/world/ServerWorld;Ljava/util/function/Consumer;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/SpawnReason;ZZ)Lnet/minecraft/entity/Entity;")
+            method = "useOn",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/server/level/ServerLevel;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;ZZ)Lnet/minecraft/world/entity/Entity;")
     )
-    private <T extends Entity> @Nullable T checkCustom2(@Nullable T original, @Local(argsOnly = true)ItemUsageContext context) {
-        if (!(original instanceof ArmorStandEntity armorStand)) return original;
-        var armor = context.getStack().get(ArmorRack.ARMOR_STAND_ARMOR);
+    private <T extends Entity> @Nullable T checkCustom2(@Nullable T original, @Local(argsOnly = true)UseOnContext context) {
+        if (!(original instanceof ArmorStand armorStand)) return original;
+        var armor = context.getItemInHand().get(ArmorRack.ARMOR_STAND_ARMOR);
         if (armor == null) return original;
         armor.apply(armorStand);
         return original;
