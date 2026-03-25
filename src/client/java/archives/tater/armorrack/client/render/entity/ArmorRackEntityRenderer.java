@@ -15,6 +15,6 @@ public class ArmorRackEntityRenderer extends ArmorStandRenderer {
 
     @Override
     public Identifier getTextureLocation(ArmorStandRenderState armorStandEntityRenderState) {
-        return DEFAULT_SKIN_LOCATION;
+        return TEXTURE;
     }
 }

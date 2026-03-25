@@ -1,11 +1,15 @@
 package archives.tater.armorrack;
 
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
+
+import org.jspecify.annotations.Nullable;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import net.minecraft.world.item.ItemStack;
 
 public class ArmorRackUtil {
     public static <K, V> Collector<Map.Entry<K, V>, ?, Map<K, V>> entriesToMap() {
@@ -38,6 +42,10 @@ public class ArmorRackUtil {
         }
 
         return Objects.hash(values);
+    }
+
+    public static ItemStack createNullable(@Nullable ItemStackTemplate template) {
+        return template == null ? ItemStack.EMPTY : template.create();
     }
 
     private ArmorRackUtil() {}

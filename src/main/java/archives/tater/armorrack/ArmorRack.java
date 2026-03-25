@@ -5,7 +5,7 @@ import archives.tater.armorrack.item.ArmorRackItem;
 import archives.tater.armorrack.item.ArmorStandArmorComponent;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
@@ -60,7 +60,7 @@ public class ArmorRack implements ModInitializer {
 			id("armor_stand_armor"),
 			DataComponentType.<ArmorStandArmorComponent>builder()
 					.persistent(ArmorStandArmorComponent.CODEC)
-					.networkSynchronized(ArmorStandArmorComponent.PACKET_CODEC)
+					.networkSynchronized(ArmorStandArmorComponent.STREAM_CODEC)
 					.cacheEncoding()
 					.build()
 	);
@@ -91,8 +91,8 @@ public class ArmorRack implements ModInitializer {
         //noinspection DataFlowIssue
         FabricDefaultAttributeRegistry.register(ARMOR_RACK_ENTITY, ArmorRackEntity.createLivingAttributes());
 
-		ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(content -> {
-			content.addAfter(Items.ARMOR_STAND, EMPTY_ARMOR_RACK_ITEM);
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(output -> {
+			output.insertAfter(Items.ARMOR_STAND, EMPTY_ARMOR_RACK_ITEM);
 		});
 
         ResourceLoader.registerBuiltinPack(FLAT_RESOURCE_PACK_ID,

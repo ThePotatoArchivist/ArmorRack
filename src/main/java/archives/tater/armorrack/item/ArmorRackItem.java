@@ -2,10 +2,7 @@ package archives.tater.armorrack.item;
 
 import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.entity.ArmorRackEntity;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
@@ -16,10 +13,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorStandItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.HashMap;
+
+import static archives.tater.armorrack.ArmorRackUtil.createNullable;
 
 public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider {
     public ArmorRackItem(Item.Properties settings) {
@@ -60,15 +65,15 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
         if (empty && Arrays.stream(EquipmentSlot.values()).allMatch(slot -> !slot.isArmor() || user.getItemBySlot(slot).isEmpty()))
             return null;
         var resultArmor = new HashMap<>(armorComponent.items());
-        var fullSwap = empty || armorComponent.items().keySet().stream().anyMatch(slot -> slot.equipmentSlot.isArmor() && user.getItemBySlot(slot.equipmentSlot).isEmpty());
+        var fullSwap = empty || armorComponent.items().keySet().stream().anyMatch(slot -> slot.isArmor() && user.getItemBySlot(slot).isEmpty());
 
         var didEquip = false;
 
-        for (ArmorStandArmorComponent.Slot slot : ArmorStandArmorComponent.Slot.values()) {
-            if (!slot.equipmentSlot.isArmor()) continue;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (!slot.isArmor()) continue;
 
-            ItemStack armorItem = armorComponent.get(slot);
-            ItemStack equippedArmor = user.getItemBySlot(slot.equipmentSlot);
+            ItemStack armorItem = createNullable(armorComponent.get(slot));
+            ItemStack equippedArmor = user.getItemBySlot(slot);
 
             if (!fullSwap && armorItem.isEmpty()) continue;
 
@@ -77,8 +82,11 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
             if (EnchantmentHelper.has(equippedArmor, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE))
                 continue;
 
-            user.setItemSlot(slot.equipmentSlot, armorItem);
-            resultArmor.put(slot, equippedArmor);
+            user.setItemSlot(slot, armorItem);
+            if (equippedArmor.isEmpty())
+                resultArmor.remove(slot);
+            else
+                resultArmor.put(slot, ItemStackTemplate.fromNonEmptyStack(equippedArmor));
         }
 
         if (!didEquip) user.playSound(SoundEvents.ARMOR_EQUIP_GENERIC.value(), 1f, 1f);

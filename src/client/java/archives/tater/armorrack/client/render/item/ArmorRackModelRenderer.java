@@ -3,19 +3,20 @@ package archives.tater.armorrack.client.render.item;
 import archives.tater.armorrack.ArmorRack;
 import archives.tater.armorrack.client.render.ArmorRackEntityCache;
 import archives.tater.armorrack.client.render.entity.ArmorRackEntityRenderer;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.serialization.MapCodec;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3fc;
-
-import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
-import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.item.ItemStack;
+
+import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandRenderState> {
 
@@ -24,14 +25,13 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandRe
     private static final CameraRenderState CAMERA_STATE = new CameraRenderState();
 
     @Override
-    public void render(@Nullable ArmorStandRenderState data, ItemDisplayContext displayContext, PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, boolean glint, int i) {
-        if (data != null)
-            data.lightCoords = light;
-        matrices.pushPose();
-        matrices.translate(0.5f, 0f, 0.5f);
-        matrices.scale(-1, 1, -1);
-        Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(data).submit(data, matrices, queue, CAMERA_STATE);
-        matrices.popPose();
+    public void submit(@Nullable ArmorStandRenderState argument, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+        if (argument == null) return;
+        poseStack.pushPose();
+        poseStack.translate(0.5f, 0f, 0.5f);
+        poseStack.scale(-1, 1, -1);
+        Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(argument).submit(argument, poseStack, submitNodeCollector, CAMERA_STATE);
+        poseStack.popPose();
     }
 
     @Override
@@ -49,17 +49,17 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandRe
         return ArmorRackEntityCache.getOrCreate(stack, world);
     }
 
-    public record Unbaked() implements SpecialModelRenderer.Unbaked {
+    public record Unbaked() implements SpecialModelRenderer.Unbaked<ArmorStandRenderState> {
 
         public static final MapCodec<ArmorRackModelRenderer.Unbaked> CODEC = MapCodec.unit(new ArmorRackModelRenderer.Unbaked());
 
         @Override
-        public SpecialModelRenderer<?> bake(BakingContext context) {
+        public SpecialModelRenderer<ArmorStandRenderState> bake(BakingContext context) {
             return new ArmorRackModelRenderer();
         }
 
         @Override
-        public MapCodec<? extends SpecialModelRenderer.Unbaked> type() {
+        public MapCodec<? extends SpecialModelRenderer.Unbaked<ArmorStandRenderState>> type() {
             return CODEC;
         }
     }

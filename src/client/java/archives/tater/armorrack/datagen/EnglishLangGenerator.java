@@ -1,13 +1,16 @@
 package archives.tater.armorrack.datagen;
 
 import archives.tater.armorrack.ArmorRack;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
+
 import net.minecraft.core.HolderLookup.Provider;
+
 import java.util.concurrent.CompletableFuture;
 
 public class EnglishLangGenerator extends FabricLanguageProvider {
-    public EnglishLangGenerator(FabricDataOutput dataOutput, CompletableFuture<Provider> registriesFuture) {
+    public EnglishLangGenerator(FabricPackOutput dataOutput, CompletableFuture<Provider> registriesFuture) {
         super(dataOutput, registriesFuture);
     }
 
