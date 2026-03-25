@@ -9,6 +9,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.objectweb.asm.Opcodes;
 
 import net.minecraft.core.BlockPos;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -45,6 +47,14 @@ public abstract class ArmorStandEntityMixin extends LivingEntity {
     )
     private Block armorRackParticles(Block original) {
         return hasAttached(ArmorRack.IS_ARMOR_RACK) ? Blocks.ANVIL : original;
+    }
+
+    @ModifyArg(
+            method = "getPickResult",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;<init>(Lnet/minecraft/world/level/ItemLike;)V")
+    )
+    private ItemLike armorRackPick(ItemLike item) {
+        return hasAttached(ArmorRack.IS_ARMOR_RACK) ? ArmorRack.EMPTY_ARMOR_RACK_ITEM : item;
     }
 
     @WrapOperation(
