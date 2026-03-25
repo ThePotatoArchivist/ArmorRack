@@ -1,13 +1,11 @@
 package archives.tater.armorrack.item;
 
 import archives.tater.armorrack.ArmorRack;
-import archives.tater.armorrack.entity.ArmorRackEntity;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorStandItem;
@@ -26,14 +24,9 @@ import java.util.HashMap;
 
 import static archives.tater.armorrack.ArmorRackUtil.createNullable;
 
-public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider {
+public class ArmorRackItem extends ArmorStandItem {
     public ArmorRackItem(Item.Properties settings) {
         super(settings);
-    }
-
-    @Override
-    public EntityType<ArmorRackEntity> getSpawnedEntityType() {
-        return ArmorRack.ARMOR_RACK_ENTITY;
     }
 
     @Override
@@ -43,13 +36,13 @@ public class ArmorRackItem extends ArmorStandItem implements ArmorStandProvider 
     }
 
     @Override
-    public InteractionResult use(Level world, Player user, InteractionHand hand) {
-        if (!user.isSecondaryUseActive()) return super.use(world, user, hand);
+    public InteractionResult use(Level level, Player user, InteractionHand hand) {
+        if (!user.isSecondaryUseActive()) return super.use(level, user, hand);
         ItemStack itemStack = user.getItemInHand(hand);
         var resultStack = trySwap(user, itemStack);
 
         return resultStack == null
-                ? super.use(world, user, hand)
+                ? super.use(level, user, hand)
                 : resultStack == itemStack
                         ? InteractionResult.SUCCESS
                         : InteractionResult.SUCCESS.heldItemTransformedTo(resultStack);

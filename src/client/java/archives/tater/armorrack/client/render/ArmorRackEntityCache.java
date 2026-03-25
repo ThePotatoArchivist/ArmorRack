@@ -1,9 +1,9 @@
 package archives.tater.armorrack.client.render;
 
-import archives.tater.armorrack.client.render.entity.ArmorRackEntityRenderer;
 import archives.tater.armorrack.entity.ArmorRackEntity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -17,15 +17,15 @@ public class ArmorRackEntityCache {
 
     private static final Map<Level, Map<ItemStack, ArmorStandRenderState>> CACHE = new WeakHashMap<>();
 
-    public static ArmorStandRenderState getOrCreate(ItemStack itemStack, Level world) {
+    public static ArmorStandRenderState getOrCreate(ItemStack itemStack, Level level) {
         return CACHE.computeIfAbsent(
-                world,
+                level,
                 _ -> new WeakHashMap<>()
         ).computeIfAbsent(
                 itemStack,
                 _ -> {
-                    var entity = ArmorRackEntity.fromItemStack(world, itemStack);
-                    var renderer = (ArmorRackEntityRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
+                    var entity = ArmorRackEntity.fromItemStack(level, itemStack);
+                    var renderer = (ArmorStandRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
                     var state = renderer.createRenderState();
                     renderer.extractRenderState(entity, state, 1f);
                     return state;

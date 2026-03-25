@@ -3,8 +3,9 @@
   "package": "archives.tater.armorrack.mixin.client",
   "compatibilityLevel": "JAVA_25",
   "client": [
+    "ArmorStandRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-	}
+  }
 }
