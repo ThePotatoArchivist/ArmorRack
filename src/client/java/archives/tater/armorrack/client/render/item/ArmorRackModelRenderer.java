@@ -36,10 +36,9 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandRe
 
     @Override
     public void getExtents(Consumer<Vector3fc> vertices) {
-        PoseStack matrixStack = new PoseStack();
         var state = new ArmorStandRenderState();
         state.entityType = ArmorRack.ARMOR_RACK_ENTITY;
-        ((ArmorRackEntityRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(state)).getModel().root().getExtentsForGui(matrixStack, vertices);
+        ((ArmorRackEntityRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(state)).getModel().root().getExtentsForGui(new PoseStack(), vertices);
     }
 
     @Override

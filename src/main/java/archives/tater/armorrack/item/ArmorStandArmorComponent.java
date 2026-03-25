@@ -61,11 +61,13 @@ public record ArmorStandArmorComponent(Map<EquipmentSlot, ItemStackTemplate> ite
 
     public static final EquipmentSlot[] TOOLTIP_ORDER = {
             EquipmentSlot.HEAD,
-            EquipmentSlot.BODY,
+            EquipmentSlot.CHEST,
             EquipmentSlot.LEGS,
             EquipmentSlot.FEET,
             EquipmentSlot.MAINHAND,
-            EquipmentSlot.OFFHAND
+            EquipmentSlot.OFFHAND,
+            EquipmentSlot.BODY,
+            EquipmentSlot.SADDLE,
     };
 
     public static final ArmorStandArmorComponent EMPTY = new ArmorStandArmorComponent(Map.of());
