@@ -18,19 +18,15 @@ public class ArmorRackEntityCache {
     private static final Map<Level, Map<ItemStack, ArmorStandRenderState>> CACHE = new WeakHashMap<>();
 
     public static ArmorStandRenderState getOrCreate(ItemStack itemStack, Level level) {
-        return CACHE.computeIfAbsent(
-                level,
-                _ -> new WeakHashMap<>()
-        ).computeIfAbsent(
-                itemStack,
-                _ -> {
+        return CACHE
+                .computeIfAbsent(level, _ -> new WeakHashMap<>())
+                .computeIfAbsent(itemStack, _ -> {
                     var entity = ArmorRackEntity.fromItemStack(level, itemStack);
                     var renderer = (ArmorStandRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(entity);
                     var state = renderer.createRenderState();
                     renderer.extractRenderState(entity, state, 1f);
                     return state;
-                }
-        );
+                });
     }
 
 }
