@@ -8,7 +8,7 @@ import archives.tater.armorrack.mixin.ArmorStandEntityInvoker;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Unit;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.TypedEntityData;
@@ -46,7 +46,7 @@ public class ArmorRackEntity {
     }
 
     public static ArmorStand fromItemStack(Level level, ItemStack itemStack) {
-        var entity = new ArmorStand(EntityType.ARMOR_STAND, level);
+        var entity = new ArmorStand(EntityTypes.ARMOR_STAND, level);
         entity.setAttached(ArmorRack.IS_ARMOR_RACK, Unit.INSTANCE);
         var nbt = itemStack.get(DataComponents.ENTITY_DATA);
         if (nbt != null) nbt.loadInto(entity);

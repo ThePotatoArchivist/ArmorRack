@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.ArmorStandRenderer;
 import net.minecraft.client.renderer.entity.state.ArmorStandRenderState;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
 
 import org.joml.Vector3fc;
@@ -37,7 +37,7 @@ public class ArmorRackModelRenderer implements SpecialModelRenderer<ArmorStandRe
     @Override
     public void getExtents(Consumer<Vector3fc> vertices) {
         var state = new ArmorStandRenderState();
-        state.entityType = EntityType.ARMOR_STAND;
+        state.entityType = EntityTypes.ARMOR_STAND;
         ((ArmorStandRenderer) Minecraft.getInstance().getEntityRenderDispatcher().getRenderer(state)).getModel().root().getExtentsForGui(new PoseStack(), vertices);
     }
 

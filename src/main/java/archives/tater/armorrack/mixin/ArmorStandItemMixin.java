@@ -20,9 +20,9 @@ import org.jetbrains.annotations.Nullable;
 public class ArmorStandItemMixin {
     @ModifyExpressionValue(
             method = "useOn",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/server/level/ServerLevel;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;ZZ)Lnet/minecraft/world/entity/Entity;")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/PostSpawnProcessor;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;ZZ)Lnet/minecraft/world/entity/Entity;")
     )
-    private <T extends Entity> @Nullable T checkCustom2(@Nullable T original, @Local(argsOnly = true)UseOnContext context) {
+    private <T extends Entity> @Nullable T checkCustom2(@Nullable T original, @Local(argsOnly = true, name = "context") UseOnContext context) {
         if ((Object) this instanceof ArmorRackItem)
             original.setAttached(ArmorRack.IS_ARMOR_RACK, Unit.INSTANCE);
 

@@ -20,7 +20,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.Unit;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -86,7 +86,7 @@ public class ArmorRack implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		BuiltInRegistries.ENTITY_TYPE.addAlias(id("armor_rack"), BuiltInRegistries.ENTITY_TYPE.getKey(EntityType.ARMOR_STAND));
+		BuiltInRegistries.ENTITY_TYPE.addAlias(id("armor_rack"), BuiltInRegistries.ENTITY_TYPE.getKey(EntityTypes.ARMOR_STAND));
 
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FUNCTIONAL_BLOCKS).register(output ->
 				output.insertAfter(Items.ARMOR_STAND, EMPTY_ARMOR_RACK_ITEM)
