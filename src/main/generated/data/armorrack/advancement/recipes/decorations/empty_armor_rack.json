@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "armorrack:empty_armor_rack"
+        "recipes": "armorrack:empty_armor_rack"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
